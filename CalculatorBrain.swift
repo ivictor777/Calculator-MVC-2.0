@@ -91,8 +91,7 @@ import Foundation
                 
                 if(resultIsPending) {
                     
-                    comboOperation = true // binary + unary
-                   // description = description! + symbol + String(accumulator!) // desc for operand 2 of combo op
+                    comboOperation = true // binary + unary (unary operation under 2nd operand of binary operation)
                     
                     var descPart2: String
                     
@@ -107,8 +106,6 @@ import Foundation
                          print("{1}")
                     }
                     else {
-                        //count++
-                   
                         if lastOperationType == "unary" {
                             descPart2 = symbol + addBrackets(to: pendingComboOperation!.descPart2)
                         }
@@ -149,22 +146,17 @@ import Foundation
             case .binaryOperation(let function):
                 
                 if pendingBinaryOperation != nil && resultIsPending {
-                    performPendingBinaryOperation()
+                    performPendingBinaryOperation() // 2 step of binary operation
                 }
                 
+                // 1 step of binary operation: save function and first operand:
+
                 if accumulator != nil {
-                pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!) // 1 step of binary operation: save function and first operand
-                }
+                pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!)                 }
                 
                 if description == nil {
                     description = displayString! + symbol
                 }
-                /* else if lastOperationType != nil && lastOperationType == "unary"{
-                    description = description! + symbol
-                }
-                else {
-                     description = description! + String(accumulator!) + symbol
-                } */
                 else {
                     description = description! + symbol
                 }
@@ -225,7 +217,6 @@ import Foundation
             var descPart1: String
             var descPart2: String
             mutating func performDescription() -> String {
-    
                 return descPart1 + descPart2
             }
         }
@@ -240,12 +231,11 @@ import Foundation
             }
             else {
                 if pendingComboOperation != nil {
-                    description = pendingComboOperation!.performDescription()
+                    description = pendingComboOperation!.performDescription() // merge parts of description after combo operation is done
                 }
             }
  
-            accumulator = pendingBinaryOperation!.perform(with: accumulator!) // 2 step of binary operation
-        
+            accumulator = pendingBinaryOperation!.perform(with: accumulator!)
         }
     }
     
