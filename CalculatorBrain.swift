@@ -1,6 +1,6 @@
 //
 //  CalculatorBrain.swift
-//  Calculator
+//  Calculator with history
 //
 //  Created by Виктор on 20.12.2017.
 //  Copyright © 2017 Виктор. All rights reserved.
