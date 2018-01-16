@@ -34,6 +34,8 @@ import Foundation
     
     public var description: String?
         
+    private var descPart2: String = ""
+        
     public var comboOperation = false
         
     private var pendingBinaryOperation: PendingBinaryOperation?
@@ -45,6 +47,8 @@ import Foundation
     public var lastOperation: String?
     
     private var lastOperationType: String?
+        
+    private var lastBinaryOperation: String?
         
     private let highPrioretyOperations = ["x", "/"]
         
@@ -86,15 +90,21 @@ import Foundation
             switch operation {
             case .constant(let value):
                 accumulator = value
-                
+                if resultIsPending {
+                    if pendingComboOperation != nil {
+                        pendingComboOperation!.descPart2 = symbol
+                    }
+                }
+                else {
+                    if description != nil {
+                        description = symbol
+                    }
+                }
             case .unaryOperation(let function):
                 
                 if(resultIsPending) {
                     
                     comboOperation = true // binary + unary (unary operation under 2nd operand of binary operation)
-                    
-                    var descPart2: String
-                    
                     
                     if pendingComboOperation == nil {
                         if(accumulator != nil){
@@ -154,8 +164,8 @@ import Foundation
                 if accumulator != nil {
                 pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!)                 }
                 
-                if lastOperationType != nil && description != nil {  // add brackets to description if last operation have low priority
-                    if lastOperationType! == "binary" && lowPrioretyOperations.contains(lastOperation!) && highPrioretyOperations.contains(symbol) {
+                if  lastBinaryOperation != nil && description != nil {  // add brackets to description if last operation have low priority
+                    if lowPrioretyOperations.contains(lastBinaryOperation!) && highPrioretyOperations.contains(symbol) {
                     description = addBrackets(to: description!)
                     }
                 }
@@ -170,7 +180,7 @@ import Foundation
                 comboOperation = false
                 resultIsPending = true
                 lastOperationType = "binary"
-                
+                lastBinaryOperation = symbol
            
             case .equals:
                 if lastOperation == "=" {
