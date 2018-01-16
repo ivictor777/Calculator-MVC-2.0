@@ -149,10 +149,16 @@ import Foundation
                     performPendingBinaryOperation() // 2 step of binary operation
                 }
                 
-                // 1 step of binary operation: save function and first operand:
+                /* 1 step of binary operation: save function and first operand: */
 
                 if accumulator != nil {
                 pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!)                 }
+                
+                if lastOperationType != nil && description != nil {  // add brackets to description if last operation have low priority
+                    if lastOperationType! == "binary" && lowPrioretyOperations.contains(lastOperation!) && highPrioretyOperations.contains(symbol) {
+                    description = addBrackets(to: description!)
+                    }
+                }
                 
                 if description == nil {
                     description = displayString! + symbol
@@ -163,7 +169,6 @@ import Foundation
                 
                 comboOperation = false
                 resultIsPending = true
-                
                 lastOperationType = "binary"
                 
            
