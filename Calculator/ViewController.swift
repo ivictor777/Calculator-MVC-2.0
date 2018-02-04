@@ -34,17 +34,10 @@ class ViewController: UIViewController {
     var descValue: String {
         get {
             var result = ""
-            
-            if brain.comboOperation == true {
-                result = brain.pendingComboOperation!.performDescription()
-            }
-            else {
+        
                 if brain.description != nil {
                     result = brain.description!
                 }
-            }
-        
-            
             
                 if brain.resultIsPending == true {
                     return result  + "..."
@@ -71,12 +64,7 @@ class ViewController: UIViewController {
             display.text = digit
             userIsInTheMiddleOfTyping = true
         }
-      //  if(brain.resultIsPending == false) {
-      //  brain.description = ""
-      //  }
-        
-     //   print("\(digit) was touched")
-        
+
     }
     
     @IBAction func touchPoint(_ sender: UIButton) {
