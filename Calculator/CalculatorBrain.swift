@@ -46,6 +46,7 @@ import Foundation
     "C": Operation.clear()
     ]
 
+        
     mutating func setAccumulator(value newValue: Double, displayValue: String?) {
         accumulator.value = newValue
         if(displayValue != nil){
@@ -53,6 +54,15 @@ import Foundation
         }
         else {
         accumulator.displayValue = newValue.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", newValue) : String(newValue)
+        }
+        
+        if isResultPending() == true {
+
+            description = pendingBinaryOperation!.descriptionPending + accumulator.displayValue
+            
+        }
+        else {
+            description = accumulator.displayValue
         }
     }
         
@@ -62,25 +72,17 @@ import Foundation
             switch operation {
             case .constant(let value):
                 setAccumulator(value: value, displayValue: symbol)
-                if resultIsPending == false {
-                    description = accumulator.displayValue
-                }
+
             case .unaryOperation(let function):
                 if accumulator.value != nil {
-                    setAccumulator(value: function(accumulator.value!), displayValue: symbol + addBrackets(to: accumulator.displayValue))
-
-                    if resultIsPending == false {
-                        description = accumulator.displayValue
-                    }
- 
+             
+                    setAccumulator(value: function(accumulator.value!), displayValue: isResultPending() == true ? symbol + addBrackets(to: accumulator.displayValue) : symbol + addBrackets(to: description!) )
+        
+                    
                 }
             case .binaryOperation(let function, let priority):
                 if accumulator.value != nil {
-        
-                    if resultIsPending == false {
-                        description = accumulator.displayValue
-                    }
-                    
+    
                     if pendingBinaryOperation != nil {
                         performPendingBinaryOperation()
                         
@@ -91,7 +93,7 @@ import Foundation
                     
                     description! += symbol
                     
-                    pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator.value!, priority: priority, resultIsPending: true)
+                    pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator.value!, priority: priority, resultIsPending: true, descriptionPending: description!)
                     
                 }
             case .equals:
@@ -118,6 +120,7 @@ import Foundation
             let firstOperand: Double
             let priority: Int
             var resultIsPending: Bool
+            let descriptionPending: String
         
             func perform(with secondOperand: Double) -> Double {
                 return function(firstOperand, secondOperand)
@@ -127,16 +130,25 @@ import Foundation
     
     private mutating func performPendingBinaryOperation(){ // if press equals or binary operation (when pending)
         
-     if(pendingBinaryOperation != nil && accumulator.value != nil ) {
-        if pendingBinaryOperation!.resultIsPending == true {
-            description! += accumulator.displayValue
-            setAccumulator(value: pendingBinaryOperation!.perform(with: accumulator.value!), displayValue: description!)
+   
+        if isResultPending() {
+ 
+            setAccumulator(value: pendingBinaryOperation!.perform(with: accumulator.value!), displayValue: accumulator.displayValue)
             }
-        }
+        
     }
     
     mutating func setOperand(_ operand: Double) {
         setAccumulator(value: operand, displayValue: nil)
+    }
+        
+    func isResultPending() -> Bool {
+        if pendingBinaryOperation != nil {
+            return pendingBinaryOperation!.resultIsPending
+        }
+        else {
+            return false
+        }
     }
     
     var result: (Double?) {
@@ -147,12 +159,7 @@ import Foundation
         
         var resultIsPending: Bool {
             get {
-                if pendingBinaryOperation != nil {
-                  return pendingBinaryOperation!.resultIsPending
-                }
-                else {
-                    return false
-                }
+                return isResultPending() ? true : false
             }
         }
 
