@@ -74,11 +74,9 @@ struct CalculatorBrain {
                 
             case .unaryOperation(let function):
                 if accumulator.value != nil {
-                    
                     setAccumulator(value: function(accumulator.value!), displayValue: isResultPending() == true ? symbol + addBrackets(to: accumulator.displayValue) : symbol + addBrackets(to: description!) )
-                    
-                    
                 }
+                
             case .binaryOperation(let function, let priority):
                 if accumulator.value != nil {
                     
@@ -95,11 +93,13 @@ struct CalculatorBrain {
                     pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator.value!, priority: priority, resultIsPending: true, descriptionPending: description!)
                     
                 }
+                
             case .equals:
                 performPendingBinaryOperation()
                 if pendingBinaryOperation != nil {
                     pendingBinaryOperation!.resultIsPending = false
                 }
+                
             case .clear:
                 accumulator = (nil, "")
                 description = nil
@@ -128,10 +128,7 @@ struct CalculatorBrain {
     
     
     private mutating func performPendingBinaryOperation(){ // if press equals or binary operation (when pending)
-        
-        
         if isResultPending() {
-            
             setAccumulator(value: pendingBinaryOperation!.perform(with: accumulator.value!), displayValue: accumulator.displayValue)
         }
         
